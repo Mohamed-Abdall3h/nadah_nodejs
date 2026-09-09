@@ -83,4 +83,32 @@ router.post('/sources', async(req,res,next)=>{try{const {id,name,type='منصة 
 router.patch('/sources/:id', async(req,res,next)=>{try{const {name,type,color,initials,sortOrder}=req.body||{};await db.run('UPDATE sources SET name=COALESCE(?,name),type=COALESCE(?,type),color=COALESCE(?,color),initials=COALESCE(?,initials),sort_order=COALESCE(?,sort_order) WHERE id=?',[name,type,color,initials,sortOrder,req.params.id]);res.json({ok:true})}catch(e){next(e)}});
 router.delete('/sources/:id', async(req,res,next)=>{try{await db.run('DELETE FROM sources WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
 
+
+router.get('/videos', async(req,res,next)=>{try{const rows=await db.all('SELECT * FROM videos ORDER BY published_at DESC');res.json({videos:rows})}catch(e){next(e)}});
+router.post('/videos', async(req,res,next)=>{
+ try{const {title,description,url,thumbnailUrl,categoryKey,sourceId,articleId}=req.body||{};
+  if(!title||!url)return res.status(400).json({error:'عنوان الفيديو والرابط مطلوبان'});
+  const id=crypto.randomUUID();
+  await db.run(`INSERT INTO videos(id,title,description,url,thumbnail_url,category_key,source_id,article_id) VALUES(?,?,?,?,?,?,?,?)`,
+   [id,title,description||'',url,thumbnailUrl||'',categoryKey||null,sourceId||null,articleId||null]);
+  res.status(201).json({id});
+ }catch(e){next(e)}
+});
+router.patch('/videos/:id',async(req,res,next)=>{try{
+ const map={title:'title',description:'description',url:'url',thumbnailUrl:'thumbnail_url',categoryKey:'category_key',sourceId:'source_id',articleId:'article_id'};
+ const sets=[],args=[];for(const [k,c] of Object.entries(map))if(req.body[k]!==undefined){sets.push(`${c}=?`);args.push(req.body[k]);}
+ if(!sets.length)return res.status(400).json({error:'لا توجد تغييرات'});args.push(req.params.id);
+ await db.run(`UPDATE videos SET ${sets.join(', ')} WHERE id=?`,args);res.json({ok:true});
+}catch(e){next(e)}});
+router.delete('/videos/:id',async(req,res,next)=>{try{await db.run('DELETE FROM videos WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
+
+router.get('/notifications',async(req,res,next)=>{try{res.json({notifications:await db.all('SELECT * FROM notifications ORDER BY created_at DESC LIMIT 100')})}catch(e){next(e)}});
+router.post('/notifications',async(req,res,next)=>{try{
+ const {title,body,articleId}=req.body||{}; if(!title||!body)return res.status(400).json({error:'العنوان والنص مطلوبان'});
+ const r=await db.run('INSERT INTO notifications(title,body,article_id) VALUES(?,?,?)',[title,body,articleId||null]);
+ res.status(201).json({id:r.lastInsertRowid});
+}catch(e){next(e)}});
+router.delete('/notifications/:id',async(req,res,next)=>{try{await db.run('DELETE FROM notifications WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
+
+
 module.exports = router;

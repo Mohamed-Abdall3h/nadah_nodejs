@@ -13,6 +13,8 @@ const premiumRoutes = require('./routes/premium');
 const favoritesRoutes = require('./routes/favorites');
 const savedRoutes = require('./routes/saved');
 const adminRoutes = require('./routes/admin');
+const videosRoutes = require('./routes/videos');
+const notificationsRoutes = require('./routes/notifications');
 
 const app = express();
 app.use(cors());
@@ -28,6 +30,8 @@ app.use('/api/premium', premiumRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/videos', videosRoutes);
+app.use('/api/notifications', notificationsRoutes);
 app.use('/admin', express.static(require('path').join(__dirname, 'admin')));
 
 // 404 handler
