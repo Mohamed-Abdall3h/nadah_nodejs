@@ -62,40 +62,6 @@ CREATE TABLE IF NOT EXISTS articles (
   FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE SET NULL
 );
 
-
-CREATE TABLE IF NOT EXISTS videos (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  url TEXT NOT NULL,
-  thumbnail_url TEXT,
-  category_key TEXT,
-  source_id TEXT,
-  article_id TEXT,
-  published_at TEXT NOT NULL DEFAULT (datetime('now')),
-  created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE SET NULL,
-  FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS notifications (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  body TEXT NOT NULL,
-  article_id TEXT,
-  created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS notification_reads (
-  notification_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
-  read_at TEXT NOT NULL DEFAULT (datetime('now')),
-  PRIMARY KEY (notification_id, user_id),
-  FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS premium_plans (
   id             TEXT PRIMARY KEY,
   period         TEXT NOT NULL,
@@ -131,6 +97,40 @@ CREATE TABLE IF NOT EXISTS saved_articles (
   PRIMARY KEY (user_id, article_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS videos (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  url TEXT NOT NULL,
+  thumbnail_url TEXT,
+  category_key TEXT,
+  source_id TEXT,
+  article_id TEXT,
+  published_at TEXT NOT NULL DEFAULT (datetime('now')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (source_id) REFERENCES sources(id) ON DELETE SET NULL,
+  FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  article_id TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_notifications (
+  notification_id TEXT NOT NULL,
+  user_id INTEGER NOT NULL,
+  is_read INTEGER NOT NULL DEFAULT 0,
+  read_at TEXT,
+  PRIMARY KEY (notification_id, user_id),
+  FOREIGN KEY (notification_id) REFERENCES notifications(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS premium_purchases (

@@ -8,15 +8,17 @@ router.use(requireAdmin);
 
 router.get('/stats', async (req, res, next) => {
   try {
-    const [users, articles, premium, favorites, saved, purchases] = await Promise.all([
+    const [users, articles, premium, favorites, saved, purchases, videos, notifications] = await Promise.all([
       db.get('SELECT COUNT(*) AS count FROM users'),
       db.get('SELECT COUNT(*) AS count FROM articles'),
       db.get('SELECT COUNT(*) AS count FROM users WHERE is_premium=1 AND (premium_expires_at IS NULL OR premium_expires_at > datetime(\'now\'))'),
       db.get('SELECT COUNT(*) AS count FROM favorites'),
       db.get('SELECT COUNT(*) AS count FROM saved_articles'),
       db.get('SELECT COALESCE(SUM(price_paid),0) AS total FROM premium_purchases'),
+      db.get('SELECT COUNT(*) AS count FROM videos'),
+      db.get('SELECT COUNT(*) AS count FROM notifications'),
     ]);
-    res.json({ users: users.count, articles: articles.count, premiumUsers: premium.count, favorites: favorites.count, saved: saved.count, revenue: purchases.total });
+    res.json({ users: users.count, articles: articles.count, premiumUsers: premium.count, favorites: favorites.count, saved: saved.count, revenue: purchases.total, videos: videos.count, notifications: notifications.count });
   } catch (e) { next(e); }
 });
 
@@ -84,31 +86,12 @@ router.patch('/sources/:id', async(req,res,next)=>{try{const {name,type,color,in
 router.delete('/sources/:id', async(req,res,next)=>{try{await db.run('DELETE FROM sources WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
 
 
-router.get('/videos', async(req,res,next)=>{try{const rows=await db.all('SELECT * FROM videos ORDER BY published_at DESC');res.json({videos:rows})}catch(e){next(e)}});
-router.post('/videos', async(req,res,next)=>{
- try{const {title,description,url,thumbnailUrl,categoryKey,sourceId,articleId}=req.body||{};
-  if(!title||!url)return res.status(400).json({error:'عنوان الفيديو والرابط مطلوبان'});
-  const id=crypto.randomUUID();
-  await db.run(`INSERT INTO videos(id,title,description,url,thumbnail_url,category_key,source_id,article_id) VALUES(?,?,?,?,?,?,?,?)`,
-   [id,title,description||'',url,thumbnailUrl||'',categoryKey||null,sourceId||null,articleId||null]);
-  res.status(201).json({id});
- }catch(e){next(e)}
-});
-router.patch('/videos/:id',async(req,res,next)=>{try{
- const map={title:'title',description:'description',url:'url',thumbnailUrl:'thumbnail_url',categoryKey:'category_key',sourceId:'source_id',articleId:'article_id'};
- const sets=[],args=[];for(const [k,c] of Object.entries(map))if(req.body[k]!==undefined){sets.push(`${c}=?`);args.push(req.body[k]);}
- if(!sets.length)return res.status(400).json({error:'لا توجد تغييرات'});args.push(req.params.id);
- await db.run(`UPDATE videos SET ${sets.join(', ')} WHERE id=?`,args);res.json({ok:true});
-}catch(e){next(e)}});
-router.delete('/videos/:id',async(req,res,next)=>{try{await db.run('DELETE FROM videos WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
-
-router.get('/notifications',async(req,res,next)=>{try{res.json({notifications:await db.all('SELECT * FROM notifications ORDER BY created_at DESC LIMIT 100')})}catch(e){next(e)}});
-router.post('/notifications',async(req,res,next)=>{try{
- const {title,body,articleId}=req.body||{}; if(!title||!body)return res.status(400).json({error:'العنوان والنص مطلوبان'});
- const r=await db.run('INSERT INTO notifications(title,body,article_id) VALUES(?,?,?)',[title,body,articleId||null]);
- res.status(201).json({id:r.lastInsertRowid});
-}catch(e){next(e)}});
-router.delete('/notifications/:id',async(req,res,next)=>{try{await db.run('DELETE FROM notifications WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
-
+router.get('/videos', async(req,res,next)=>{try{const rows=await db.all(`SELECT v.*,c.name AS category_name,s.name AS source_name FROM videos v LEFT JOIN categories c ON c.id=v.category_key LEFT JOIN sources s ON s.id=v.source_id ORDER BY v.published_at DESC`);res.json({videos:rows})}catch(e){next(e)}});
+router.post('/videos', async(req,res,next)=>{try{const {title,description,url,thumbnailUrl,categoryKey,sourceId,articleId}=req.body||{};if(!title||!url)return res.status(400).json({error:'العنوان والرابط مطلوبان'});const id=crypto.randomUUID();await db.run(`INSERT INTO videos(id,title,description,url,thumbnail_url,category_key,source_id,article_id) VALUES(?,?,?,?,?,?,?,?)`,[id,title,description||'',url,thumbnailUrl||'',categoryKey||'video',sourceId||null,articleId||null]);res.status(201).json({id})}catch(e){next(e)}});
+router.patch('/videos/:id', async(req,res,next)=>{try{const m={title:'title',description:'description',url:'url',thumbnailUrl:'thumbnail_url',categoryKey:'category_key',sourceId:'source_id',articleId:'article_id'};const sets=[],args=[];for(const[k,c]of Object.entries(m))if(req.body[k]!==undefined){sets.push(`${c}=?`);args.push(req.body[k]||null)}if(!sets.length)return res.status(400).json({error:'لا توجد تغييرات'});args.push(req.params.id);await db.run(`UPDATE videos SET ${sets.join(', ')} WHERE id=?`,args);res.json({ok:true})}catch(e){next(e)}});
+router.delete('/videos/:id', async(req,res,next)=>{try{await db.run('DELETE FROM videos WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
+router.get('/notifications', async(req,res,next)=>{try{const rows=await db.all(`SELECT n.*,a.title AS article_title FROM notifications n LEFT JOIN articles a ON a.id=n.article_id ORDER BY n.created_at DESC`);res.json({notifications:rows})}catch(e){next(e)}});
+router.post('/notifications', async(req,res,next)=>{try{const {title,body,articleId}=req.body||{};if(!title||!body)return res.status(400).json({error:'العنوان والنص مطلوبان'});const id=crypto.randomUUID();await db.run('INSERT INTO notifications(id,title,body,article_id) VALUES(?,?,?,?)',[id,title,body,articleId||null]);const users=await db.all('SELECT id FROM users WHERE role != \'admin\'');for(const u of users){await db.run('INSERT OR IGNORE INTO user_notifications(notification_id,user_id) VALUES(?,?)',[id,u.id])}res.status(201).json({id})}catch(e){next(e)}});
+router.delete('/notifications/:id', async(req,res,next)=>{try{await db.run('DELETE FROM notifications WHERE id=?',[req.params.id]);res.json({ok:true})}catch(e){next(e)}});
 
 module.exports = router;

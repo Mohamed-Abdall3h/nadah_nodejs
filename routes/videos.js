@@ -1,25 +1,24 @@
 const express = require('express');
-const crypto = require('crypto');
 const db = require('../db/database');
 const { optionalAuth } = require('../middleware/auth');
 const router = express.Router();
 
-function serialize(v) {
-  return { id:v.id,title:v.title,description:v.description,url:v.url,thumbnailUrl:v.thumbnail_url||'',
-    categoryKey:v.category_key||'',sourceId:v.source_id||null,articleId:v.article_id||null,
-    publishedAt:v.published_at };
+function serialize(r) {
+  return { id: r.id, title: r.title, description: r.description || '', url: r.url,
+    thumbnailUrl: r.thumbnail_url || '', category: r.category_name || r.category_key || 'فيديو',
+    source: r.source_name || null, articleId: r.article_id || null, publishedAt: r.published_at };
 }
+
 router.get('/', optionalAuth, async (req,res,next)=>{
   try {
-    const limit=Math.min(parseInt(req.query.limit)||50,100), offset=parseInt(req.query.offset)||0;
-    const args=[]; const where=[];
-    if(req.query.category){where.push('v.category_key=?');args.push(req.query.category);}
-    if(req.query.search){where.push('(v.title LIKE ? OR v.description LIKE ?)');args.push(`%${req.query.search}%`,`%${req.query.search}%`);}
-    const rows=await db.all(`SELECT v.* FROM videos v ${where.length?'WHERE '+where.join(' AND '):''} ORDER BY v.published_at DESC LIMIT ? OFFSET ?`,[...args,limit,offset]);
-    res.json({videos:rows.map(serialize)});
+    const rows=await db.all(`SELECT v.*, c.name AS category_name, s.name AS source_name FROM videos v LEFT JOIN categories c ON c.id=v.category_key LEFT JOIN sources s ON s.id=v.source_id ORDER BY v.published_at DESC`);
+    res.json({videos: rows.map(serialize)});
   } catch(e){next(e)}
 });
-router.get('/:id', optionalAuth, async(req,res,next)=>{
-  try { const v=await db.get('SELECT * FROM videos WHERE id=?',[req.params.id]); if(!v)return res.status(404).json({error:'الفيديو غير موجود'}); res.json({video:serialize(v)}); } catch(e){next(e)}
+
+router.get('/:id', optionalAuth, async (req,res,next)=>{
+  try { const r=await db.get(`SELECT v.*, c.name AS category_name, s.name AS source_name FROM videos v LEFT JOIN categories c ON c.id=v.category_key LEFT JOIN sources s ON s.id=v.source_id WHERE v.id=?`,[req.params.id]);
+    if(!r)return res.status(404).json({error:'الفيديو غير موجود'}); res.json({video:serialize(r)});
+  } catch(e){next(e)}
 });
 module.exports=router;

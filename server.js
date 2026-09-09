@@ -46,6 +46,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 seedIfEmpty()
+  .then(() => require('./db/seed').seedVideos())
   .then(() => require('./db/seed').ensureAdmin())
   .then(() => {
     app.listen(PORT, () => {

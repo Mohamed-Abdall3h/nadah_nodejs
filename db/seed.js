@@ -149,6 +149,15 @@ if (require.main === module) {
 }
 
 
+
+async function seedVideos() {
+  const exists = await db.get('SELECT id FROM videos LIMIT 1');
+  if (exists) return;
+  await db.run(`INSERT INTO videos(id,title,description,url,thumbnail_url,category_key,source_id) VALUES (?,?,?,?,?,?,?)`,[
+    'demo-youtube-1','فيديو تجريبي - آخر أخبار ليبيا','فيديو تجريبي لاختبار تشغيل YouTube داخل التطبيق.','https://www.youtube.com/watch?v=dQw4w9WgXcQ','https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg','video','s1'
+  ]);
+}
+
 async function ensureAdmin() {
   const bcrypt = require('bcryptjs');
   const email = process.env.ADMIN_EMAIL || 'admin@gmail.com';
@@ -163,3 +172,4 @@ async function ensureAdmin() {
 }
 
 module.exports.ensureAdmin = ensureAdmin;
+module.exports.seedVideos = seedVideos;
