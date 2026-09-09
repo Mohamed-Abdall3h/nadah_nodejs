@@ -7,7 +7,7 @@ const { requireAuth, JWT_SECRET } = require('../middleware/auth');
 const router = express.Router();
 
 function signToken(user) {
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ id: user.id, email: user.email, role: user.role || 'user' }, JWT_SECRET, { expiresIn: '30d' });
 }
 
 function publicUser(user) {
