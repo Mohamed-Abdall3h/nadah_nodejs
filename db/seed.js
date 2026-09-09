@@ -27,36 +27,36 @@ const breakingArticles = [
   ['b1','المركزي الليبي يعلن عن إجراءات جديدة لضبط السوق المصرفية في ليبيا','اقتصاد','economy','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1,1],
   ['b2','وزارة النفط: زيادة في إنتاج النفط الخام خلال الشهر الجاري في ليبيا','اقتصاد','economy','https://commons.wikimedia.org/wiki/Special:FilePath/North_Sea_oil_rig.jpg',1,0],
   ['b3','الجيش الليبي يعلن عن عملية أمنية ناجحة في الجنوب الليبي','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',1,0],
-  ['b4','هيئة الأرصاد: أمطار رعدية على عدة مناطق من ليبيا','حالة الطقس','weather','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',1,0],
-  ['b5','وزارة التعليم الليبي تعلن عن بداية الامتحانات النهائية للجامعات','تعليم','education','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1,0],
-  ['b6','ارتفاع عدد السياح الوافدين إلى ليبيا هذا العام','سياحة','tourism','https://commons.wikimedia.org/wiki/Special:FilePath/Leptis_Magna,_Al-Khums,_Libya.jpg',1,0],
+  ['b4','هيئة الأرصاد: أمطار رعدية على عدة مناطق من ليبيا','منوعات','misc','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',1,0],
+  ['b5','وزارة التعليم الليبي تعلن عن بداية الامتحانات النهائية للجامعات','ثقافة','culture','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1,0],
+  ['b6','ارتفاع عدد السياح الوافدين إلى ليبيا هذا العام','منوعات','misc','https://commons.wikimedia.org/wiki/Special:FilePath/Leptis_Magna,_Al-Khums,_Libya.jpg',1,0],
   ['b7','نائب القائد العام صدام حفتر يستقبل عميد بلدية براك الشاطئ في بنغازي','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',1,1],
   ['b8','موسى الكوني يستقبل وفدًا من مصراتة لبحث قضايا التوافق الوطني','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/Misrata,_Libya.jpg',1,0],
-  ['b9','الكتيبة 58 صاعقة تنفذ تدريبات بدنية مكثفة في شوارع بنغازي','أمن','security','https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',1,0],
+  ['b9','الكتيبة 58 صاعقة تنفذ تدريبات بدنية مكثفة في شوارع بنغازي','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',1,0],
   ['b10','نائب القائد العام يهنئ المغرب بالتأهل إلى ربع نهائي كأس العالم','رياضة','sports','https://commons.wikimedia.org/wiki/Special:FilePath/11_June_Stadium_BenTaher.jpg',1,0],
-  ['b11','نائب تركي يتهم وزير النقل بإخفاء وثائق تحقيق تحطم طائرة محمد الحداد','عربي ودولي','international','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',1,0],
+  ['b11','نائب تركي يتهم وزير النقل بإخفاء وثائق تحقيق تحطم طائرة محمد الحداد','عربي ودولي','intl','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',1,0],
   ['b12','العائب يواصل مهامه على رأس جهاز المخابرات الليبي رغم قرار الإقالة','سياسة','politics','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1,1],
-  ['b13','بعثة "إيريني" الأوروبية تشتبه في نقل أسلحة إلى ليبيا عبر 60 رحلة جوية سرية','عربي ودولي','international','https://commons.wikimedia.org/wiki/Special:FilePath/North_Sea_oil_rig.jpg',1,0],
+  ['b13','بعثة "إيريني" الأوروبية تشتبه في نقل أسلحة إلى ليبيا عبر 60 رحلة جوية سرية','عربي ودولي','intl','https://commons.wikimedia.org/wiki/Special:FilePath/North_Sea_oil_rig.jpg',1,0],
   ['b14','حملة أمنية مشتركة في طرابلس وبنغازي لمداهمة مقار تؤوي مهاجرين غير نظاميين','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1,0],
   ['b15','محكمة استئناف سرت تعقد أولى جلساتها القضائية وتباشر اختصاصها رسميًا','محلي','local','https://commons.wikimedia.org/wiki/Special:FilePath/The_Old_Town,_Benghazi,_Libya.jpg',1,0],
-  ['b16','تحذير من السباحة على طول الساحل الليبي بسبب اضطراب حركة البحر','حالة الطقس','weather','https://commons.wikimedia.org/wiki/Special:FilePath/Leptis_Magna,_Al-Khums,_Libya.jpg',1,0],
+  ['b16','تحذير من السباحة على طول الساحل الليبي بسبب اضطراب حركة البحر','منوعات','misc','https://commons.wikimedia.org/wiki/Special:FilePath/Leptis_Magna,_Al-Khums,_Libya.jpg',1,0],
 ];
 
 const homeArticles = [
   ['h1','مجلس النواب يخصص جلسة استثنائية لمناقشة ميزانية ليبيا لعام 2024','رئيسية','main',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',1],
   ['h2','المؤسسة الوطنية للنفط تعلن عن زيادة في معدلات الإنتاج','اقتصاد','economy','s1','https://commons.wikimedia.org/wiki/Special:FilePath/North_Sea_oil_rig.jpg',0],
   ['h3','منتخب ليبيا يتأهل إلى الدور النهائي من تصفيات كأس أفريقيا','رياضة','sports','s2','https://commons.wikimedia.org/wiki/Special:FilePath/11_June_Stadium_BenTaher.jpg',0],
-  ['h4','طقس اليوم: أجواء مشمسة في معظم المناطق وارتفاع في درجات الحرارة','حالة الطقس','weather',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
+  ['h4','طقس اليوم: أجواء مشمسة في معظم المناطق وارتفاع في درجات الحرارة','منوعات','misc',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
   ['h5','افتتاح مشروع تحلية المياه الجديد في بنغازي بحضور المسؤولين','محلي','local',null,'https://commons.wikimedia.org/wiki/Special:FilePath/The_Old_Town,_Benghazi,_Libya.jpg',0],
-  ['h6','السفارة الأمريكية في طرابلس تصدر بيانات بشأن الوضع الأمني','عربي ودولي','international','s4','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
-  ['h7','رئيس المخابرات الليبية يبحث مع نظيره المالطي التعاون الأمني المشترك','عربي ودولي','international',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',0],
+  ['h6','السفارة الأمريكية في طرابلس تصدر بيانات بشأن الوضع الأمني','عربي ودولي','intl','s4','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
+  ['h7','رئيس المخابرات الليبية يبحث مع نظيره المالطي التعاون الأمني المشترك','عربي ودولي','intl',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',0],
   ['h8','مصادر: الدبيبة يبدي استياءه عقب إلغاء لقائه المرتقب مع أمير قطر','سياسة','politics','s1','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
   ['h9','نائب القائد العام يلتقي رئيس جهاز مكافحة المخدرات في بنغازي','محلي','local',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',0],
   ['h10','عضو الحوار المهيكل: لقاءات دولية متتالية تعكس تحولًا في تعاطي المجتمع الدولي مع الملف الليبي','سياسة','politics','s2','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',0],
-  ['h11','مصر تبحث هاتفيًا مع الموفد الأمريكي مسعد بولس تطورات الأزمة الليبية','عربي ودولي','international','s4','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
+  ['h11','مصر تبحث هاتفيًا مع الموفد الأمريكي مسعد بولس تطورات الأزمة الليبية','عربي ودولي','intl','s4','https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
   ['h12','رحلات جوية يومية مرتقبة قريبًا لربط مدينتي بنغازي وسبها','اقتصاد','economy',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Benghazi_city_centre.JPG',0],
   ['h13','موسى الكوني لوفد مصراتة: يجب تغليب المصلحة الوطنية على الحسابات الضيقة','سياسة','politics',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Misrata,_Libya.jpg',0],
-  ['h14','عبدالعاطي لبولس: التسوية السياسية الشاملة تتطلب مسارًا ليبيًا-ليبيًا خالصًا','عربي ودولي','international',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
+  ['h14','عبدالعاطي لبولس: التسوية السياسية الشاملة تتطلب مسارًا ليبيًا-ليبيًا خالصًا','عربي ودولي','intl',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_by_night.jpg',0],
   ['h15','الدبيبة يوجه بحل عاجل لأزمة انقطاع الكهرباء المتكررة في عدة مناطق','اقتصاد','economy',null,'https://commons.wikimedia.org/wiki/Special:FilePath/Tripoli_center.jpg',0],
   ['h16','رسميًا: موعد ثأري يجمع المغرب وفرنسا في أولى مواجهات ربع نهائي مونديال 2026','رياضة','sports',null,'https://commons.wikimedia.org/wiki/Special:FilePath/11_June_Stadium_BenTaher.jpg',0],
 ];
@@ -118,6 +118,36 @@ async function seed() {
 /// (first deploy) it fills it in automatically; on a database that
 /// already has data (including any edits made later from a dashboard),
 /// it does nothing.
+async function normalizeCategories() {
+  const aliases = {
+    international: 'intl',
+    weather: 'misc',
+    education: 'culture',
+    tourism: 'misc',
+    security: 'local',
+    main: 'local',
+  };
+
+  for (const [oldKey, newKey] of Object.entries(aliases)) {
+    await db.run('UPDATE articles SET category_key=? WHERE category_key=?', [newKey, oldKey]);
+    await db.run('UPDATE videos SET category_key=? WHERE category_key=?', [newKey, oldKey]);
+  }
+
+  const flutterCategories = categories;
+  for (let i = 0; i < flutterCategories.length; i++) {
+    const c = flutterCategories[i];
+    await db.run(
+      `INSERT OR REPLACE INTO categories (id,name,icon,color,sort_order) VALUES (?,?,?,?,?)`,
+      [c.id, c.name, c.icon, c.color, i]
+    );
+  }
+
+  // Remove legacy category rows that do not exist in Flutter.
+  const allowed = flutterCategories.map(c => c.id);
+  const placeholders = allowed.map(() => '?').join(',');
+  await db.run(`DELETE FROM categories WHERE id NOT IN (${placeholders})`, allowed);
+}
+
 async function seedIfEmpty() {
   await db.init();
   const row = await db.get('SELECT COUNT(*) AS count FROM categories');
@@ -173,3 +203,4 @@ async function ensureAdmin() {
 
 module.exports.ensureAdmin = ensureAdmin;
 module.exports.seedVideos = seedVideos;
+module.exports.normalizeCategories = normalizeCategories;

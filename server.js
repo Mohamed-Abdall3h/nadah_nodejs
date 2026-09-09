@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const db = require('./db/database');
-const { seedIfEmpty } = require('./db/seed');
+const { seedIfEmpty, normalizeCategories } = require('./db/seed');
 
 const authRoutes = require('./routes/auth');
 const articlesRoutes = require('./routes/articles');
@@ -46,6 +46,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 seedIfEmpty()
+  .then(() => normalizeCategories())
   .then(() => require('./db/seed').seedVideos())
   .then(() => require('./db/seed').ensureAdmin())
   .then(() => {
