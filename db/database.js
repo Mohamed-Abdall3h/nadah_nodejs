@@ -1,12 +1,24 @@
 const path = require('path');
-const Database = require('better-sqlite3');
+const { createClient } = require('@libsql/client');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'nabdh.db');
-const db = new Database(DB_PATH);
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+// ─────────────────────────────────────────────
+//  DATABASE CONNECTION
+// ─────────────────────────────────────────────
+// Locally (no env vars set): uses a plain SQLite file on disk.
+// In production on a free host (Render, etc.), point these two env vars
+// at a free Turso database instead — same code, same queries, but the
+// data lives outside the server's disk so it survives redeploys/restarts:
+//
+//   TURSO_DATABASE_URL=libsql://your-db-name.turso.io
+//   TURSO_AUTH_TOKEN=<token from `turso db tokens create`>
+//
+const url = process.env.TURSO_DATABASE_URL || `file:${path.join(__dirname, 'nabdh.db')}`;
+const authToken = process.env.TURSO_AUTH_TOKEN; // undefined is fine for local file mode
 
-db.exec(`
+const client = createClient({ url, authToken });
+
+async function init() {
+  const statements = `
 CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   name          TEXT NOT NULL,
@@ -96,6 +108,30 @@ CREATE TABLE IF NOT EXISTS premium_purchases (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (plan_id) REFERENCES premium_plans(id)
 );
-`);
+`.split(';').map(s => s.trim()).filter(Boolean);
 
-module.exports = db;
+  for (const stmt of statements) {
+    await client.execute(stmt);
+  }
+}
+
+// ── Thin helpers so route code stays close to plain SQL ──
+// get(sql, args)  -> single row or undefined
+// all(sql, args)  -> array of rows
+// run(sql, args)  -> { lastInsertRowid, changes }
+async function get(sql, args = []) {
+  const res = await client.execute({ sql, args });
+  return res.rows[0];
+}
+
+async function all(sql, args = []) {
+  const res = await client.execute({ sql, args });
+  return res.rows;
+}
+
+async function run(sql, args = []) {
+  const res = await client.execute({ sql, args });
+  return { lastInsertRowid: res.lastInsertRowid, changes: res.rowsAffected };
+}
+
+module.exports = { client, init, get, all, run };

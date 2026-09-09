@@ -32,10 +32,10 @@ function serializeArticle(row, favoriteIds, savedIds) {
   };
 }
 
-function getUserSets(userId) {
+async function getUserSets(userId) {
   if (!userId) return { favoriteIds: new Set(), savedIds: new Set() };
-  const favs = db.prepare('SELECT article_id FROM favorites WHERE user_id = ?').all(userId);
-  const saved = db.prepare('SELECT article_id FROM saved_articles WHERE user_id = ?').all(userId);
+  const favs = await db.all('SELECT article_id FROM favorites WHERE user_id = ?', [userId]);
+  const saved = await db.all('SELECT article_id FROM saved_articles WHERE user_id = ?', [userId]);
   return {
     favoriteIds: new Set(favs.map(r => r.article_id)),
     savedIds: new Set(saved.map(r => r.article_id)),
@@ -49,44 +49,61 @@ const BASE_QUERY = `
 `;
 
 // GET /api/articles?category=&breaking=&featured=&search=&limit=&offset=
-router.get('/', optionalAuth, (req, res) => {
-  const { category, breaking, featured, search } = req.query;
-  const limit = Math.min(parseInt(req.query.limit) || 50, 100);
-  const offset = parseInt(req.query.offset) || 0;
+router.get('/', optionalAuth, async (req, res, next) => {
+  try {
+    const { category, breaking, featured, search } = req.query;
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+    const offset = parseInt(req.query.offset) || 0;
 
-  const clauses = [];
-  const params = {};
-  if (category) { clauses.push('a.category_key = @category'); params.category = category; }
-  if (breaking !== undefined) { clauses.push('a.is_breaking = @breaking'); params.breaking = breaking === 'true' ? 1 : 0; }
-  if (featured !== undefined) { clauses.push('a.is_featured = @featured'); params.featured = featured === 'true' ? 1 : 0; }
-  if (search) { clauses.push('a.title LIKE @search'); params.search = `%${search}%`; }
+    const clauses = [];
+    const args = [];
+    if (category) { clauses.push('a.category_key = ?'); args.push(category); }
+    if (breaking !== undefined) { clauses.push('a.is_breaking = ?'); args.push(breaking === 'true' ? 1 : 0); }
+    if (featured !== undefined) { clauses.push('a.is_featured = ?'); args.push(featured === 'true' ? 1 : 0); }
+    if (search) { clauses.push('a.title LIKE ?'); args.push(`%${search}%`); }
 
-  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
-  const rows = db
-    .prepare(`${BASE_QUERY} ${where} ORDER BY a.published_at DESC LIMIT @limit OFFSET @offset`)
-    .all({ ...params, limit, offset });
+    const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+    const rows = await db.all(
+      `${BASE_QUERY} ${where} ORDER BY a.published_at DESC LIMIT ? OFFSET ?`,
+      [...args, limit, offset]
+    );
 
-  const { favoriteIds, savedIds } = getUserSets(req.user && req.user.id);
-  res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+    const { favoriteIds, savedIds } = await getUserSets(req.user && req.user.id);
+    res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get('/breaking', optionalAuth, (req, res) => {
-  const rows = db.prepare(`${BASE_QUERY} WHERE a.is_breaking = 1 ORDER BY a.published_at DESC`).all();
-  const { favoriteIds, savedIds } = getUserSets(req.user && req.user.id);
-  res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+router.get('/breaking', optionalAuth, async (req, res, next) => {
+  try {
+    const rows = await db.all(`${BASE_QUERY} WHERE a.is_breaking = 1 ORDER BY a.published_at DESC`);
+    const { favoriteIds, savedIds } = await getUserSets(req.user && req.user.id);
+    res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get('/home', optionalAuth, (req, res) => {
-  const rows = db.prepare(`${BASE_QUERY} WHERE a.is_breaking = 0 ORDER BY a.published_at DESC`).all();
-  const { favoriteIds, savedIds } = getUserSets(req.user && req.user.id);
-  res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+router.get('/home', optionalAuth, async (req, res, next) => {
+  try {
+    const rows = await db.all(`${BASE_QUERY} WHERE a.is_breaking = 0 ORDER BY a.published_at DESC`);
+    const { favoriteIds, savedIds } = await getUserSets(req.user && req.user.id);
+    res.json({ articles: rows.map(r => serializeArticle(r, favoriteIds, savedIds)) });
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get('/:id', optionalAuth, (req, res) => {
-  const row = db.prepare(`${BASE_QUERY} WHERE a.id = @id`).get({ id: req.params.id });
-  if (!row) return res.status(404).json({ error: 'المقال غير موجود' });
-  const { favoriteIds, savedIds } = getUserSets(req.user && req.user.id);
-  res.json({ article: serializeArticle(row, favoriteIds, savedIds) });
+router.get('/:id', optionalAuth, async (req, res, next) => {
+  try {
+    const row = await db.get(`${BASE_QUERY} WHERE a.id = ?`, [req.params.id]);
+    if (!row) return res.status(404).json({ error: 'المقال غير موجود' });
+    const { favoriteIds, savedIds } = await getUserSets(req.user && req.user.id);
+    res.json({ article: serializeArticle(row, favoriteIds, savedIds) });
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

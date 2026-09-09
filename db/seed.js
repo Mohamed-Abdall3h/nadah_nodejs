@@ -67,37 +67,83 @@ const premiumPlans = [
   { id: 'quarterly', period: '3 أشهر', price: 49,  original_price: null, saving_label: null,       is_featured: 0, duration_days: 90 },
 ];
 
-function run() {
-  const insertCategory = db.prepare(`INSERT OR REPLACE INTO categories (id,name,icon,color,sort_order) VALUES (?,?,?,?,?)`);
-  categories.forEach((c, i) => insertCategory.run(c.id, c.name, c.icon, c.color, i));
+async function seed() {
+  for (let i = 0; i < categories.length; i++) {
+    const c = categories[i];
+    await db.run(
+      `INSERT OR REPLACE INTO categories (id,name,icon,color,sort_order) VALUES (?,?,?,?,?)`,
+      [c.id, c.name, c.icon, c.color, i]
+    );
+  }
 
-  const insertSource = db.prepare(`INSERT OR REPLACE INTO sources (id,name,type,color,initials,sort_order) VALUES (?,?,?,?,?,?)`);
-  sources.forEach((s, i) => insertSource.run(s.id, s.name, s.type, s.color, s.initials, i));
+  for (let i = 0; i < sources.length; i++) {
+    const s = sources[i];
+    await db.run(
+      `INSERT OR REPLACE INTO sources (id,name,type,color,initials,sort_order) VALUES (?,?,?,?,?,?)`,
+      [s.id, s.name, s.type, s.color, s.initials, i]
+    );
+  }
 
-  const insertArticle = db.prepare(`
-    INSERT OR REPLACE INTO articles
-      (id,title,category_name,category_key,source_id,image_url,is_breaking,is_featured)
-    VALUES (?,?,?,?,?,?,?,?)
-  `);
-  breakingArticles.forEach(([id, title, categoryName, categoryKey, imageUrl, isBreaking, isFeatured]) => {
-    insertArticle.run(id, title, categoryName, categoryKey, null, imageUrl, isBreaking, isFeatured);
-  });
-  homeArticles.forEach(([id, title, categoryName, categoryKey, sourceId, imageUrl, isFeatured]) => {
-    insertArticle.run(id, title, categoryName, categoryKey, sourceId, imageUrl, 0, isFeatured);
-  });
+  for (const [id, title, categoryName, categoryKey, imageUrl, isBreaking, isFeatured] of breakingArticles) {
+    await db.run(
+      `INSERT OR REPLACE INTO articles (id,title,category_name,category_key,source_id,image_url,is_breaking,is_featured) VALUES (?,?,?,?,?,?,?,?)`,
+      [id, title, categoryName, categoryKey, null, imageUrl, isBreaking, isFeatured]
+    );
+  }
 
-  const insertPlan = db.prepare(`
-    INSERT OR REPLACE INTO premium_plans (id,period,price,original_price,saving_label,is_featured,duration_days)
-    VALUES (?,?,?,?,?,?,?)
-  `);
-  premiumPlans.forEach(p => insertPlan.run(p.id, p.period, p.price, p.original_price, p.saving_label, p.is_featured, p.duration_days));
+  for (const [id, title, categoryName, categoryKey, sourceId, imageUrl, isFeatured] of homeArticles) {
+    await db.run(
+      `INSERT OR REPLACE INTO articles (id,title,category_name,category_key,source_id,image_url,is_breaking,is_featured) VALUES (?,?,?,?,?,?,?,?)`,
+      [id, title, categoryName, categoryKey, sourceId, imageUrl, 0, isFeatured]
+    );
+  }
 
-  console.log('✅ Seed complete:', {
+  for (const p of premiumPlans) {
+    await db.run(
+      `INSERT OR REPLACE INTO premium_plans (id,period,price,original_price,saving_label,is_featured,duration_days) VALUES (?,?,?,?,?,?,?)`,
+      [p.id, p.period, p.price, p.original_price, p.saving_label, p.is_featured, p.duration_days]
+    );
+  }
+
+  return {
     categories: categories.length,
     sources: sources.length,
     articles: breakingArticles.length + homeArticles.length,
     plans: premiumPlans.length,
-  });
+  };
 }
 
-run();
+/// Seeds the database ONLY if it's empty (checked via the categories table).
+/// Safe to call every time the server boots: on a fresh/empty database
+/// (first deploy) it fills it in automatically; on a database that
+/// already has data (including any edits made later from a dashboard),
+/// it does nothing.
+async function seedIfEmpty() {
+  await db.init();
+  const row = await db.get('SELECT COUNT(*) AS count FROM categories');
+  const count = Number(row?.count ?? 0);
+  if (count > 0) {
+    console.log(`ℹ️  Database already has data (${count} categories) — skipping seed.`);
+    return null;
+  }
+  console.log('🌱 Empty database detected — seeding initial data...');
+  const summary = await seed();
+  console.log('✅ Seed complete:', summary);
+  return summary;
+}
+
+module.exports = { seed, seedIfEmpty };
+
+// Allows `npm run seed` to still work as a manual one-off command.
+if (require.main === module) {
+  db.init()
+    .then(seed)
+    .then(summary => {
+      console.log('✅ Seed complete:', summary);
+      process.exit(0);
+    })
+    .catch(err => {
+      console.error('❌ Seed failed:', err);
+      process.exit(1);
+    });
+}

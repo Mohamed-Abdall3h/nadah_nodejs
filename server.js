@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-require('./db/database'); // ensures schema exists on boot
+const db = require('./db/database');
+const { seedIfEmpty } = require('./db/seed');
 
 const authRoutes = require('./routes/auth');
 const articlesRoutes = require('./routes/articles');
@@ -36,6 +37,16 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 نبض ليبيا API running on http://localhost:${PORT}`);
-});
+
+seedIfEmpty()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 نبض ليبيا API running on http://localhost:${PORT}`);
+      console.log(`📦 DB: ${process.env.TURSO_DATABASE_URL ? 'Turso (remote, persistent)' : 'local file'}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ Failed to initialize database:', err);
+    process.exit(1);
+  });
+
