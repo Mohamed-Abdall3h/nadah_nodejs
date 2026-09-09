@@ -147,3 +147,19 @@ if (require.main === module) {
       process.exit(1);
     });
 }
+
+
+async function ensureAdmin() {
+  const bcrypt = require('bcryptjs');
+  const email = process.env.ADMIN_EMAIL || 'admin@gmail.com';
+  const password = process.env.ADMIN_PASSWORD || '123456';
+  const existing = await db.get('SELECT id FROM users WHERE email = ?', [email]);
+  const hash = bcrypt.hashSync(password, 10);
+  if (existing) {
+    await db.run("UPDATE users SET role='admin', password_hash=? WHERE id=?", [hash, existing.id]);
+  } else {
+    await db.run("INSERT INTO users (name,email,password_hash,role) VALUES (?,?,?,'admin')", ['Admin', email, hash]);
+  }
+}
+
+module.exports.ensureAdmin = ensureAdmin;

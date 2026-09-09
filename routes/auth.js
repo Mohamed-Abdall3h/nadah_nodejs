@@ -16,6 +16,7 @@ function publicUser(user) {
     name: user.name,
     email: user.email,
     isPremium: !!user.is_premium,
+    role: user.role || 'user',
     premiumExpiresAt: user.premium_expires_at,
   };
 }

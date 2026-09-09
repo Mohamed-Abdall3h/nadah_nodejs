@@ -12,6 +12,7 @@ const sourcesRoutes = require('./routes/sources');
 const premiumRoutes = require('./routes/premium');
 const favoritesRoutes = require('./routes/favorites');
 const savedRoutes = require('./routes/saved');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,8 @@ app.use('/api/sources', sourcesRoutes);
 app.use('/api/premium', premiumRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/admin', express.static(require('path').join(__dirname, 'admin')));
 
 // 404 handler
 app.use((req, res) => res.status(404).json({ error: 'المسار غير موجود' }));
@@ -39,6 +42,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 seedIfEmpty()
+  .then(() => require('./db/seed').ensureAdmin())
   .then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 نبض ليبيا API running on http://localhost:${PORT}`);

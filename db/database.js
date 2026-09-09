@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
   email         TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   is_premium    INTEGER NOT NULL DEFAULT 0,
+  role          TEXT NOT NULL DEFAULT 'user',
   premium_expires_at TEXT,
   created_at    TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -110,9 +111,9 @@ CREATE TABLE IF NOT EXISTS premium_purchases (
 );
 `.split(';').map(s => s.trim()).filter(Boolean);
 
-  for (const stmt of statements) {
-    await client.execute(stmt);
-  }
+  for (const stmt of statements) { await client.execute(stmt); }
+  // Safe migration for databases created before admin roles existed.
+  try { await client.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'"); } catch (_) {}
 }
 
 // ── Thin helpers so route code stays close to plain SQL ──
